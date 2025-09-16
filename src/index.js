@@ -31,8 +31,9 @@ class Livro{
     }
 }
 
-let livro1 = new Livro("Aguas profundas", "Arthur N.S")
-let livro2 = new Livro("sol e lua", " N.S de castro")
+const livro1 = new Livro("Aguas profundas", "Arthur N.S")
+const livro2 = new Livro("sol e lua", " N.S de castro")
+
 
 
 
@@ -73,50 +74,47 @@ class Filmes{
 let filme1 = new Filmes("A volta", "Franco N.O")
 let filme2 = new Filmes("A Ida", "Erika V.")
 
-class Usuario{
-    constructor(nome){
-        this.nome = nome;
-        this.itensEmprestados = []
+class Usuario {
+  constructor(nome) {
+    this.nome = nome;
+    this.itensEmprestados = [];
+  }
 
+  pegarItem(item) {
+    if (!item.emprestado) {
+      
+      item.emprestar();
+      this.itensEmprestados.push(item);
+      console.log(`${this.nome} pegou o item: ${item.titulo}`);
+    } else {
+      console.log(`O item ${item.titulo} já está emprestado`);
     }
+  }
 
-    pegarItem(item){
-        if(!item.emprestado){
-            item.emprestar()
-            this.itensEmprestados.push(item)
-            console.log(`${this.nome} pegou o item: ${item.titulo}`)
-        }
-        else{console.log(`O item ${item.titulo} já está emprestado`)}
+  devolverItem(item) {
+    
+    const index = this.itensEmprestados.indexOf(item);
+    if (index !== -1) {
+      item.devolver(); 
+      this.itensEmprestados.splice(index, 1); 
+      console.log(`${this.nome} devolveu o item: ${item.titulo}`);
+    } else {
+      console.log(`${this.nome} não tem o item: ${item.titulo} para devolver`);
     }
-    devolverItem(item){
-        const index = this.itensEmprestados.idexof(item)
-        if(index !== -1){ // só devolve se estiver na lista do usuario
-            item.devolver()// marca como devolver
-            this.itensEmprestados.splice(index, 1)//remove da lista
-            console.log(`${this.nome} devolveu o item: ${item.titulo}`)
-        }else{
-            console.log(`${this.nome} não tem o item: ${item.titulo} para devolver`)
-        }
+  }
 
-
+  
+  listarItens() {
+    if (this.itensEmprestados.length === 0) {
+      console.log(`${this.nome} não tem itens emprestados`);
+    } else {
+      console.log(`Itens emprestados por ${this.nome}:`);
+      this.itensEmprestados.forEach(item => {
+        console.log(`- ${item.titulo}`);
+      });
     }
-
-    listarIntens(){
-        if(this.itensEmprestados.length === 0){
-            console.log(`${this.nome} não tem itens emprestados`)
-        }
-        else{
-            console.log(`itens emprestados por ${this.nome}`)
-            this.itensEmprestados.forEach(item => {
-                console.log(`${item.titulo}`)
-            }) 
-        }
-    }
+  }
 }
-
-let usuario1 = new Usuario("Ana Oliveira")
-let usuario2 = new Usuario("Paulo Souza")
-
 
 
    
@@ -142,6 +140,13 @@ let usuario2 = new Usuario("Paulo Souza")
 
    }
 
+   
+
+
+   
+
+   
+
    class Locadora{
     constructor(){
         this.filme = []
@@ -150,7 +155,7 @@ let usuario2 = new Usuario("Paulo Souza")
     adicionarFilme(filme){
         
         this.filme.push(filme)
-        console.log(`O filme ${titulo.filme} adicionado a locadora`)
+        console.log(`O filme ${filme.titulo} foi adicionado a locadora`)
 
     }
 
@@ -160,8 +165,153 @@ let usuario2 = new Usuario("Paulo Souza")
         }
         else{
             console.log(`filmes disponiveis na locadora`)
-            this.filme.forEach(filme => console.log(`${filme.titulo}`))
+            this.filme.forEach(filme => console.log(`- ${filme.titulo} (${filme.emprestado ? "Emprestado" : "Disponível"})`))
         }
     }
    }
-    
+
+   
+const biblioteca = new Biblioteca();
+const locadora = new Locadora();
+const usuarios = []
+
+
+
+
+   
+    const readline =require('readline')
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+
+
+    })
+function mostrarMenu() {
+  console.log("\n==== MENU ====");
+  console.log("1 - Adicionar livro");
+  console.log("2 - Adicionar filme");
+  console.log("3 - Adicionar usuário");
+  console.log("4 - Listar livros");
+  console.log("5 - Listar filmes");
+  console.log("6 - Usuário pegar item");
+  console.log("7 - Usuário devolver item");
+  console.log("8 - Listar itens do usuário");
+  console.log("0 - Sair");
+}
+
+function iniciar() {
+  mostrarMenu();
+  rl.question("Escolha uma opção: ", (opcao) => {
+    switch (opcao) {
+      case "1":
+        rl.question("Título do livro: ", (titulo) => {
+          rl.question("Autor do livro: ", (autor) => {
+            biblioteca.adicionarLivro(new Livro(titulo, autor));
+            iniciar();
+          });
+        });
+        break;
+
+      case "2":
+        rl.question("Título do filme: ", (titulo) => {
+          rl.question("Diretor do filme: ", (diretor) => {
+            locadora.adicionarFilme(new Filmes(titulo, diretor));
+            iniciar();
+          });
+        });
+        break;
+
+      case "3":
+        rl.question("Nome do usuário: ", (nome) => {
+          usuarios.push(new Usuario(nome));
+          console.log(`Usuário ${nome} adicionado.`);
+          iniciar();
+        });
+        break;
+
+      case "4":
+        biblioteca.listarLivros();
+        iniciar();
+        break;
+
+      case "5":
+        locadora.listarFilmes();
+        iniciar();
+        break;
+
+      case "6":
+        if (usuarios.length === 0) {
+          console.log("Nenhum usuário cadastrado.");
+          iniciar();
+          break;
+        }
+        rl.question("Nome do usuário: ", (nomeUser) => {
+          const user = usuarios.find(u => u.nome === nomeUser);
+          if (!user) {
+            console.log("Usuário não encontrado.");
+            iniciar();
+            return;
+          }
+          rl.question("Digite L para Livro ou F para Filme: ", (tipo) => {
+            if (tipo.toUpperCase() === "L") {
+              biblioteca.listarLivros();
+              rl.question("Digite o título do livro: ", (titulo) => {
+                const item = biblioteca.livros.find(l => l.titulo === titulo);
+                if (item) user.pegarItem(item);
+                else console.log("Livro não encontrado.");
+                iniciar();
+              });
+            } else {
+              locadora.listarFilmes();
+              rl.question("Digite o título do filme: ", (titulo) => {
+                const item = locadora.filmes.find(f => f.titulo === titulo);
+                if (item) user.pegarItem(item);
+                else console.log("Filme não encontrado.");
+                iniciar();
+              });
+            }
+          });
+        });
+        break;
+
+      case "7":
+        rl.question("Nome do usuário: ", (nomeUser) => {
+          const user = usuarios.find(u => u.nome === nomeUser);
+          if (!user) {
+            console.log("Usuário não encontrado.");
+            iniciar();
+            return;
+          }
+          user.listarItens();
+          rl.question("Digite o título do item para devolver: ", (titulo) => {
+            const item = user.itensEmprestados.find(i => i.titulo === titulo);
+            if (item) user.devolverItem(item);
+            else console.log("Item não encontrado na lista do usuário.");
+            iniciar();
+          });
+        });
+        break;
+
+      case "8":
+        rl.question("Nome do usuário: ", (nomeUser) => {
+          const user = usuarios.find(u => u.nome === nomeUser);
+          if (user) user.listarItens();
+          else console.log("Usuário não encontrado.");
+          iniciar();
+        });
+        break;
+
+      case "0":
+        console.log("Saindo...");
+        rl.close();
+        break;
+
+      default:
+        console.log("Opção inválida.");
+        iniciar();
+    }
+  });
+}
+
+
+iniciar();
