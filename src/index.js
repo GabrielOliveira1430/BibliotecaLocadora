@@ -79,17 +79,21 @@ class Usuario {
     this.nome = nome;
     this.itensEmprestados = [];
   }
-
-  pegarItem(item) {
-    if (!item.emprestado) {
-      
-      item.emprestar();
-      this.itensEmprestados.push(item);
-      console.log(`${this.nome} pegou o item: ${item.titulo}`);
-    } else {
-      console.log(`O item ${item.titulo} já está emprestado`);
-    }
+pegarItem(item) {
+  if (this.itensEmprestados.length >= 3) {
+    console.log(`${this.nome} já atingiu o limite de 3 itens emprestados`);
+    return;
   }
+
+  if (!item.emprestado) {
+    item.emprestar();
+    this.itensEmprestados.push(item);
+    console.log(`${this.nome} pegou o item: ${item.titulo}`);
+  } else {
+    console.log(`O item ${item.titulo} já está emprestado`);
+  }
+}
+  
 
   devolverItem(item) {
     
